@@ -3,9 +3,19 @@ import { Link, useLocation } from 'react-router-dom'
 const Sidebar = () => {
   const location = useLocation()
   
+  // TODO: Import your icons here after adding them to src/assets/
+  // import dashboardIcon from '../assets/dashboard.svg'
+  // import projectsIcon from '../assets/projects.svg'
+  // ...
+
   const menuItems = [
-    { name: 'Dashboard', icon: '🏠', path: '/dashboard' },
-    { name: 'Projects', icon: '📁', path: '/projects' },
+    { 
+      name: 'Dashboard', 
+      icon: '🏠', 
+      // iconImg: dashboardIcon, 
+      path: '/dashboard' 
+    },
+    { name: 'Projects', icon: '📁', /* iconImg: projectsIcon, */ path: '/projects' },
     { name: 'Landing Pages', icon: '📄', path: '/landing-pages' },
     { name: 'Integration', icon: '🔗', path: '/integrations' },
     { name: 'Lead Management', icon: '👥', path: '/lead-management' },
@@ -37,6 +47,9 @@ const Sidebar = () => {
               }`}
             >
               <span className="text-lg">{item.icon}</span>
+              {/* Replace the above span with this when icons are ready:
+              <img src={item.iconImg} alt={item.name} className="w-5 h-5" />
+              */}
               <span className="text-sm">{item.name}</span>
             </Link>
           ))}
@@ -50,6 +63,7 @@ const Sidebar = () => {
           className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 transition-colors text-white"
         >
           <span className="text-lg">🚪</span>
+          {/* <img src={logoutIcon} alt="Logout" className="w-5 h-5" /> */}
           <span className="text-sm">Logout</span>
         </Link>
       </div>

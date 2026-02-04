@@ -33,29 +33,30 @@ const Dashboard = () => {
         <div className="flex items-center justify-between mb-6 pt-6">
           <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
           <div className="flex gap-4">
-            <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">
+            <button className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg text-sm text-gray-700 hover:bg-gray-50 shadow-sm">
               📅 Start Date ▼
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">
+            <button className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg text-sm text-gray-700 hover:bg-gray-50 shadow-sm">
               📅 End Date ▼
             </button>
           </div>
         </div>
 
         {/* Stats Cards Container with Blue Border */}
-        <div className="border-2 border-blue-400 rounded-lg mb-8" style={{ backgroundColor: '#E3F2FD' }}>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-6">
+        {/* Stats Cards - Standalone Blue Cards */}
+        <div className="mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {stats.map((stat, index) => (
               <div
                 key={index}
-                className="bg-white p-6 rounded-lg"
+                className="bg-blue-100 p-6 rounded-xl"
               >
-                <h3 className="text-sm text-gray-600 mb-2">{stat.title}</h3>
+                <h3 className="text-sm font-medium text-gray-700 mb-2">{stat.title}</h3>
                 <div className="flex items-end justify-between">
-                  <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
+                  <span className="text-3xl font-bold text-gray-900">{stat.value}</span>
                   <span
                     className={`text-sm font-medium ${
-                      stat.positive ? 'text-green-600' : 'text-red-600'
+                      stat.positive ? 'text-green-600' : 'text-red-500'
                     }`}
                   >
                     {stat.change}
@@ -67,7 +68,7 @@ const Dashboard = () => {
         </div>
 
         {/* Analytics Chart */}
-        <div className="bg-white p-6 rounded-lg border border-gray-200 mb-8">
+        <div className="bg-white p-6 rounded-lg mb-8 shadow-sm">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-1">
@@ -77,10 +78,10 @@ const Dashboard = () => {
               <p className="text-sm text-gray-600">Last 30 Days • +15%</p>
             </div>
             <div className="flex gap-4">
-              <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">
+              <button className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg text-sm text-gray-700 hover:bg-gray-50 shadow-sm">
                 📅 Start Date ▼
               </button>
-              <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">
+              <button className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg text-sm text-gray-700 hover:bg-gray-50 shadow-sm">
                 📅 End Date ▼
               </button>
             </div>
@@ -110,10 +111,10 @@ const Dashboard = () => {
         {/* Projects Section */}
         <div className="mb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-4">All Projects</h2>
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+          <div className="bg-white rounded-xl shadow-sm">
             <div>
               <table className="w-full">
-                <thead className="bg-white border-b border-gray-100">
+                <thead className="bg-white">
                   <tr>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">ID</th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Project Name</th>

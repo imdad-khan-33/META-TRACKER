@@ -1,40 +1,65 @@
 import loginImage from '../assets/login.png'
+import emailIcon from '../assets/email-icon.svg'
+import passwordIcon from '../assets/password-icon.svg'
+import hidePassIcon from '../assets/hide-icon-pssword.svg'
 import { Link } from 'react-router-dom'
+import { useState } from 'react'
 
 export const Login = () => {
+  const [showPassword, setShowPassword] = useState(false)
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="flex max-w-6xl w-full rounded-lg overflow-hidden gap-1">
+    <div className="min-h-screen lg:h-screen flex items-center justify-center p-4 bg-white overflow-y-auto lg:overflow-hidden py-12 lg:py-0" style={{ fontFamily: "'Inter', sans-serif" }}>
+      <div className="flex flex-col lg:flex-row max-w-6xl w-full items-center justify-center gap-6 lg:gap-8">
         
         {/* Left Side - Form */}
-        <div className="w-full md:w-1/2 p-8 mt-16">
+        <div className="w-full lg:w-[597px] flex flex-col items-center lg:items-start">
           <div className="mb-8">
-            <h1 className="font-bold text-3xl text-gray-900">
+            <h1 className="font-bold text-2xl sm:text-3xl text-gray-900">
               Welcome back
             </h1>
           </div>
 
           <form className="space-y-4">
             {/* Email Input */}
-            <div>
+            <div className="relative w-full lg:w-[480px]">
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                <img src={emailIcon} alt="Email" className="w-5 h-5" />
+              </div>
               <input
                 type="email"
                 placeholder="Email"
-                className="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full lg:w-[480px] pl-11 pr-4 py-3 bg-gray-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-base placeholder-gray-500"
               />
             </div>
 
             {/* Password Input */}
-            <div>
+            <div className="relative w-full lg:w-[480px]">
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                <img src={passwordIcon} alt="Password" className="w-5 h-5" />
+              </div>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="Password"
-                className="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full lg:w-[480px] pl-11 pr-12 py-3 bg-gray-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-base placeholder-gray-500"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none cursor-pointer"
+              >
+                {showPassword ? (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                ) : (
+                  <img src={hidePassIcon} alt="Hide Password" className="w-5 h-5" />
+                )}
+              </button>
             </div>
 
             {/* Forgot Password & Remember Me */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between w-full lg:w-[480px]">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
@@ -42,7 +67,7 @@ export const Login = () => {
                 />
                 <span className="text-sm text-gray-600">Remember me</span>
               </label>
-              <Link to="/forgot-password" className="text-sm text-blue-600 hover:text-blue-700">
+              <Link to="/forgot-password" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
                 Forgot password?
               </Link>
             </div>
@@ -50,25 +75,15 @@ export const Login = () => {
             {/* Log in Button */}
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200"
+              className="w-full lg:w-[480px] bg-blue-600 text-white font-medium py-3 rounded-lg hover:bg-blue-700 transition-all duration-200 text-base mt-5 cursor-pointer"
             >
               Log in
             </button>
 
-            {/* Divider */}
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Or continue with</span>
-              </div>
-            </div>
-
             {/* Google Login Button */}
             <button
               type="button"
-              className="w-full bg-white border border-gray-300 text-[#121217] font-medium py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 flex items-center justify-center gap-2"
+              className="w-full lg:w-[480px] bg-white border border-gray-200 text-gray-700 font-medium py-3 rounded-lg hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-2 text-base cursor-pointer"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
@@ -92,7 +107,7 @@ export const Login = () => {
             </button>
 
             {/* Signup Link */}
-            <div className="text-center mt-4">
+            <div className="text-center mt-6">
               <span className="text-sm text-gray-600">Don't have an account? </span>
               <Link to="/signup" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
                 Sign up
@@ -102,12 +117,12 @@ export const Login = () => {
         </div>
 
         {/* Right Side - Image */}
-        <div className="hidden md:block md:w-1/2 relative h-[600px] w-[553px] p-4">
-          <div className="absolute inset-0 flex items-center justify-center">
+        <div className="flex items-center justify-center overflow-hidden w-full lg:w-[553px] h-[500px] lg:h-[680px] mt-12 lg:mt-0">
+          <div className="w-full max-w-[521px] h-full lg:h-[630px] flex items-center justify-center overflow-hidden rounded-lg">
             <img 
               src={loginImage} 
               alt="Track Bridge illustration" 
-              className="w-full h-full object-contain"
+              className="w-full h-full object-cover"
             />
           </div>
         </div>

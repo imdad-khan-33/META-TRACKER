@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+/* Apply Inter font globally to all elements */
+* {
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Ensure Inter is applied to all text elements */
+h1, h2, h3, h4, h5, h6, p, span, div, a, button, input, textarea, select, label, td, th {
+  font-family: 'Inter', sans-serif;
+}
