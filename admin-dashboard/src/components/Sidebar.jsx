@@ -31,7 +31,7 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="w-64 lg:w-64 sticky top-[73px] md:top-[81px] h-[calc(100vh-73px)] md:h-[calc(100vh-81px)] bg-[#2E73E3] text-white flex flex-col overflow-y-auto">
+    <div className="w-64 lg:w-64 h-full bg-[#2E73E3] text-white flex flex-col overflow-y-auto">
       {/* Sidebar Content */}
       <div className="flex-1 py-6">
         {/* Menu Items */}

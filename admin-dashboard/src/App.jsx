@@ -40,7 +40,7 @@ function App() {
               </div>
               
               <div className="flex items-center gap-2 md:gap-4">
-                <button className="hidden sm:flex items-center gap-2 bg-gray-50 border border-gray-200 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium text-[#000000] hover:bg-gray-100 transition-colors duration-200">
+                <button className="flex items-center gap-2 bg-gray-50 border border-gray-200 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium text-[#000000] hover:bg-gray-100 transition-colors duration-200">
                   Last 30 Days <ChevronDown size={16} />
                 </button>
                 <div className="w-8 h-8 md:w-10 md:h-10 bg-slate-800 rounded-full flex items-center justify-center text-white text-xs overflow-hidden border-2 border-gray-200 cursor-pointer hover:border-[#2E73E3] transition-colors duration-200">
@@ -50,13 +50,13 @@ function App() {
             </header>
 
             {/* Content Area with Sidebar */}
-            <div className="flex relative">
+            <div className="flex">
               {/* Sidebar - Hidden on mobile, visible on desktop */}
               <div className={`
-                fixed lg:relative inset-y-0 left-0 z-30 
+                fixed left-0 z-30 
                 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
                 lg:translate-x-0 transition-transform duration-300 ease-in-out
-                top-[73px] md:top-[81px] lg:top-0
+                top-[73px] md:top-[81px] h-[calc(100vh-73px)] md:h-[calc(100vh-81px)]
               `}>
                 <Sidebar />
               </div>
@@ -69,8 +69,8 @@ function App() {
                 />
               )}
 
-              {/* Main Content with Routes */}
-              <main className="flex-1 p-4 md:p-6 lg:p-8 w-full">
+              {/* Main Content with Routes - Add left margin for sidebar on desktop */}
+              <main className="flex-1 p-4 md:p-6 lg:p-8 w-full lg:ml-64">
                 <Routes>
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/user" element={<User />} />
