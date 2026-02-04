@@ -13,8 +13,7 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Temporary login - just redirect to dashboard
-    // Later we'll add proper authentication
+  
     if (email && password) {
       navigate('/dashboard');
     }

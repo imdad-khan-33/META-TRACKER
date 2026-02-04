@@ -3,10 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 const Sidebar = () => {
   const location = useLocation()
   
-  // TODO: Import your icons here after adding them to src/assets/
-  // import dashboardIcon from '../assets/dashboard.svg'
-  // import projectsIcon from '../assets/projects.svg'
-  // ...
+ 
 
   const menuItems = [
     { 
