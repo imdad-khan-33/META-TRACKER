@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X } from 'lucide-react';
+import { X, ChevronDown } from 'lucide-react';
 import switchActive from '../assets/3D Switch.svg';
 import switchInactive from '../assets/3D Switch (1).svg';
 
@@ -7,6 +7,7 @@ const Roles = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [plan, setPlan] = useState('user');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [errors, setErrors] = useState({ email: '' });
 
   const userProfiles = [
@@ -55,7 +56,10 @@ const Roles = () => {
       <div className="mb-6 flex justify-between items-center">
         <h2 className="text-lg font-semibold text-[#000000]">User Profiles</h2>
         <button 
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            setIsModalOpen(true);
+            setIsDropdownOpen(false);
+          }}
           className="bg-[#CDE5FB]  cursor-pointer  text-[#000000] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#b0d5f8] transition-colors duration-200">
           + Create User
         </button>
@@ -143,17 +147,40 @@ const Roles = () => {
               </div>
 
               {/* Plan Dropdown */}
-              <div>
+              <div className="relative">
                 <label className="block text-sm font-semibold text-[#000000] mb-2">
                   Plan
                 </label>
-                <select
-                  value={plan}
-                  onChange={(e) => setPlan(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white cursor-pointer">
-                  <option value="user">User</option>
-                  <option value="admin">Admin</option>
-                </select>
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white cursor-pointer flex justify-between items-center text-left"
+                  >
+                    <span className="capitalize">{plan}</span>
+                    <ChevronDown size={20} className={`text-gray-500 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {isDropdownOpen && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+                      {['user', 'admin'].map((option) => (
+                        <button
+                          key={option}
+                          type="button"
+                          onClick={() => {
+                            setPlan(option);
+                            setIsDropdownOpen(false);
+                          }}
+                          className={`w-full px-4 py-2.5 text-left text-sm hover:bg-gray-50 transition-colors capitalize
+                            ${plan === option ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700'}
+                          `}
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
