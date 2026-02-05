@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Sidebar from './components/Sidebar'
 import { ChevronDown, Menu, X } from 'lucide-react'
 import logo from './assets/admin-logo.svg'
-import profile from './assets/profile.svg'
+
 
 // Import Pages
 import Login from './pages/Login'
@@ -41,9 +41,9 @@ function App() {
               </div>
               
               <div className="flex items-center gap-2 md:gap-4">
-                <div className="w-8 h-8 md:w-10 md:h-10 bg-slate-800 rounded-full flex items-center justify-center text-white text-xs overflow-hidden border-2 border-gray-200 cursor-pointer hover:border-[#2E73E3] transition-colors duration-200">
-                   <img src={profile} alt="User" className="w-full h-full object-cover" />
-                </div>
+                <span className="text-sm font-medium text-[#000000] cursor-pointer hover:text-[#2E73E3] transition-colors">
+                  Super Admin
+                </span>
               </div>
             </header>
 

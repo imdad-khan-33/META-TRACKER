@@ -6,9 +6,10 @@ import switchInactive from '../assets/3D Switch (1).svg';
 const Roles = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [email, setEmail] = useState('');
+  const [fullName, setFullName] = useState('');
   const [plan, setPlan] = useState('user');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [errors, setErrors] = useState({ email: '' });
+  const [errors, setErrors] = useState({ email: '', fullName: '' });
 
   const userProfiles = [
     { name: 'IMDAD', email: 'example@gmail.com', plan: 'admin', active: true, action: 'Remove' },
@@ -23,7 +24,7 @@ const Roles = () => {
 
   const handleCreateUser = () => {
     // Reset errors
-    setErrors({ email: '' });
+    setErrors({ email: '', fullName: '' });
 
     // Validation
     let hasError = false;
@@ -35,17 +36,24 @@ const Roles = () => {
       setErrors(prev => ({ ...prev, email: 'Please enter a valid email address' }));
       hasError = true;
     }
+    if (!fullName.trim()) {
+      setErrors(prev => ({ ...prev, fullName: 'Full Name is required' }));
+      hasError = true;
+    }
+
+
 
     // If validation fails, don't proceed
     if (hasError) return;
 
     // Handle user creation logic here
-    console.log('Creating user:', { email, plan });
+    console.log('Creating user:', { fullName, email, plan });
     
     // Reset form and close modal
     setEmail('');
+    setFullName('');
     setPlan('user');
-    setErrors({ email: '' });
+    setErrors({ email: '', fullName: '' });
     setIsModalOpen(false);
   };
 
@@ -121,6 +129,30 @@ const Roles = () => {
 
             {/* Modal Body */}
             <div className="p-6 space-y-4">
+              {/* Full Name Input */}
+              <div>
+                <label className="block text-sm font-semibold text-[#000000] mb-2">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  value={fullName}
+                  onChange={(e) => {
+                    setFullName(e.target.value);
+                    if (errors.fullName) {
+                      setErrors({ ...errors, fullName: '' });
+                    }
+                  }}
+                  placeholder="Enter full name"
+                  className={`w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    errors.fullName ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                />
+                {errors.fullName && (
+                  <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>
+                )}
+              </div>
+
               {/* Email Input */}
               <div>
                 <label className="block text-sm font-semibold text-[#000000] mb-2">
@@ -146,10 +178,10 @@ const Roles = () => {
                 )}
               </div>
 
-              {/* Plan Dropdown */}
+              {/* Role Dropdown */}
               <div className="relative">
                 <label className="block text-sm font-semibold text-[#000000] mb-2">
-                  Plan
+                  Role
                 </label>
                 <div className="relative">
                   <button
