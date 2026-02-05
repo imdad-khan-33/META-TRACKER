@@ -1,6 +1,14 @@
 import { Search } from 'lucide-react';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const User = () => {
+  const navigate = useNavigate();
+  
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const users = [
     { name: 'Liam Carter', plan: 'Pro', startDate: '2022-01-15', endDate: '2024-01-15', status: 'Active' },
     { name: 'Olivia Bennett', plan: 'Basic', startDate: '2022-02-20', endDate: '2024-02-10', status: 'Active' },
@@ -47,7 +55,14 @@ const User = () => {
             <tbody>
               {users.map((user, index) => (
                 <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
-                  <td className="py-4 px-4 text-sm text-[#61698A]">{user.name}</td>
+                  <td className="py-4 px-4 text-sm">
+                    <button 
+                      onClick={() => navigate(`/user-details/${index}`)}
+                      className="text-[#2E73E3] hover:underline cursor-pointer font-medium"
+                    >
+                      {user.name}
+                    </button>
+                  </td>
                   <td className="py-4 px-4 text-sm text-[#61698A]">{user.plan}</td>
                   <td className="py-4 px-4 text-sm text-[#61698A]">{user.startDate}</td>
                   <td className="py-4 px-4 text-sm text-[#61698A]">{user.endDate}</td>

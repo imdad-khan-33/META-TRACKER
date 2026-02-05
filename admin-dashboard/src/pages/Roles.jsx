@@ -1,11 +1,52 @@
+import { useState } from 'react';
+import { X } from 'lucide-react';
 import switchActive from '../assets/3D Switch.svg';
 import switchInactive from '../assets/3D Switch (1).svg';
 
 const Roles = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [email, setEmail] = useState('');
+  const [plan, setPlan] = useState('user');
+  const [errors, setErrors] = useState({ email: '' });
+
   const userProfiles = [
     { name: 'IMDAD', email: 'example@gmail.com', plan: 'admin', active: true, action: 'Remove' },
     { name: 'MAAZ', email: 'running@gmail.com', plan: 'user', active: false, action: 'Remove' },
   ];
+
+  // Email validation function
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const handleCreateUser = () => {
+    // Reset errors
+    setErrors({ email: '' });
+
+    // Validation
+    let hasError = false;
+
+    if (!email.trim()) {
+      setErrors(prev => ({ ...prev, email: 'Email is required' }));
+      hasError = true;
+    } else if (!validateEmail(email)) {
+      setErrors(prev => ({ ...prev, email: 'Please enter a valid email address' }));
+      hasError = true;
+    }
+
+    // If validation fails, don't proceed
+    if (hasError) return;
+
+    // Handle user creation logic here
+    console.log('Creating user:', { email, plan });
+    
+    // Reset form and close modal
+    setEmail('');
+    setPlan('user');
+    setErrors({ email: '' });
+    setIsModalOpen(false);
+  };
 
   return (
     <div className="max-w-[1400px] mx-auto">
@@ -13,7 +54,9 @@ const Roles = () => {
       
       <div className="mb-6 flex justify-between items-center">
         <h2 className="text-lg font-semibold text-[#000000]">User Profiles</h2>
-        <button className="bg-[#CDE5FB]  cursor-pointer  text-[#000000] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#b0d5f8] transition-colors duration-200">
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="bg-[#CDE5FB]  cursor-pointer  text-[#000000] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#b0d5f8] transition-colors duration-200">
           + Create User
         </button>
       </div>
@@ -57,6 +100,79 @@ const Roles = () => {
           </table>
         </div>
       </div>
+
+      {/* Create User Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 backdrop-blur-[2px] flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl w-full max-w-md border-2 border-gray-200">
+            {/* Modal Header */}
+            <div className="flex justify-between items-center p-6 border-b border-gray-200">
+              <h3 className="text-xl font-bold text-[#000000]">Create New User</h3>
+              <button 
+                onClick={() => setIsModalOpen(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors">
+                <X size={24} />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 space-y-4">
+              {/* Email Input */}
+              <div>
+                <label className="block text-sm font-semibold text-[#000000] mb-2">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    // Clear error when user starts typing
+                    if (errors.email) {
+                      setErrors({ ...errors, email: '' });
+                    }
+                  }}
+                  placeholder="Enter email address"
+                  className={`w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    errors.email ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                />
+                {errors.email && (
+                  <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+                )}
+              </div>
+
+              {/* Plan Dropdown */}
+              <div>
+                <label className="block text-sm font-semibold text-[#000000] mb-2">
+                  Plan
+                </label>
+                <select
+                  value={plan}
+                  onChange={(e) => setPlan(e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white cursor-pointer">
+                  <option value="user">User</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex justify-end gap-3 p-6 border-t border-gray-200">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                Cancel
+              </button>
+              <button
+                onClick={handleCreateUser}
+                className="px-4 py-2 text-sm font-medium text-white bg-[#2E73E3] rounded-lg hover:bg-[#2563EB] transition-colors">
+                Create User
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

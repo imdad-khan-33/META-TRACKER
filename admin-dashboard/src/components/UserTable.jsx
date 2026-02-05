@@ -1,4 +1,7 @@
+import { useNavigate } from 'react-router-dom';
+
 const UserTable = () => {
+  const navigate = useNavigate();
   const users = [
     { name: 'Liam Carter', plan: 'Pro', start: '2023-01-15', end: '2024-01-15', status: 'Active' },
     { name: 'Olivia Bennett', plan: 'Basic', start: '2023-02-20', end: '2024-02-20', status: 'Active' },
@@ -15,7 +18,12 @@ const UserTable = () => {
     <div className="bg-[#FFFFFF] rounded-[8px] border border-[#D9EAFD] shadow-sm overflow-hidden">
       {/* View More Button - Moved to Top */}
       <div className="flex justify-end px-4 md:px-6 py-3 md:py-4 border-b border-[#D9EAFD]">
-        <button className=" cursor-pointer  bg-[#2E73E3] text-white px-4 md:px-6 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium hover:bg-[#2563EB] transition-colors duration-200 shadow-sm">
+        <button 
+          onClick={() => {
+            window.scrollTo(0, 0);
+            navigate('/user');
+          }}
+          className=" cursor-pointer  bg-[#2E73E3] text-white px-4 md:px-6 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium hover:bg-[#2563EB] transition-colors duration-200 shadow-sm">
           View More
         </button>
       </div>

@@ -9,6 +9,7 @@ import profile from './assets/profile.svg'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import User from './pages/User'
+import UserDetails from './pages/UserDetails'
 import Roles from './pages/Roles'
 import Support from './pages/Support'
 
@@ -40,9 +41,6 @@ function App() {
               </div>
               
               <div className="flex items-center gap-2 md:gap-4">
-                <button className="flex items-center gap-2 bg-gray-50 border border-gray-200 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium text-[#000000] hover:bg-gray-100 transition-colors duration-200">
-                  Last 30 Days <ChevronDown size={16} />
-                </button>
                 <div className="w-8 h-8 md:w-10 md:h-10 bg-slate-800 rounded-full flex items-center justify-center text-white text-xs overflow-hidden border-2 border-gray-200 cursor-pointer hover:border-[#2E73E3] transition-colors duration-200">
                    <img src={profile} alt="User" className="w-full h-full object-cover" />
                 </div>
@@ -58,13 +56,13 @@ function App() {
                 lg:translate-x-0 transition-transform duration-300 ease-in-out
                 top-[73px] md:top-[81px] h-[calc(100vh-73px)] md:h-[calc(100vh-81px)]
               `}>
-                <Sidebar />
+                <Sidebar closeSidebar={() => setSidebarOpen(false)} />
               </div>
 
               {/* Overlay for mobile */}
               {sidebarOpen && (
                 <div 
-                  className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden top-[73px] md:top-[81px]"
+                  className="fixed inset-0 bg-white bg-opacity-80 z-20 lg:hidden top-[73px] md:top-[81px]"
                   onClick={() => setSidebarOpen(false)}
                 />
               )}
@@ -74,6 +72,7 @@ function App() {
                 <Routes>
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/user" element={<User />} />
+                  <Route path="/user-details/:id" element={<UserDetails />} />
                   <Route path="/roles" element={<Roles />} />
                   <Route path="/support" element={<Support />} />
                 </Routes>

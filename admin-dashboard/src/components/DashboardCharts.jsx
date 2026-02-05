@@ -1,6 +1,9 @@
+import { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
 import { ChevronDown } from 'lucide-react';
 import calendarIcon from '../assets/calendericon.svg';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const lineData = [
   { name: 'Jan', value: 3000 },
@@ -15,6 +18,8 @@ const lineData = [
 
 
 const DashboardCharts = () => {
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
       {/* Sales Over Time */}
@@ -34,23 +39,40 @@ const DashboardCharts = () => {
           
           {/* Date Filter Buttons */}
           <div className="flex gap-2 flex-wrap">
-            <button 
-              className="flex items-center gap-2 bg-white rounded-lg text-xs font-medium text-[#000000] hover:bg-gray-50 transition-colors duration-200"
-              style={{ padding: '8px 16px', border: '1px solid #CDE5FB' }}
-            >
-              <img src={calendarIcon} alt="Calendar" className="w-3.5 h-4" />
-              Start Date
-              <ChevronDown size={14} />
-            </button>
+            <DatePicker
+              selected={startDate}
+              onChange={(date) => setStartDate(date)}
+              placeholderText="Start Date"
+              dateFormat="dd/MM/yyyy"
+              customInput={
+                <button 
+                  className="flex items-center gap-2 bg-white rounded-lg text-xs font-medium text-[#000000] hover:bg-gray-50 transition-colors duration-200"
+                  style={{ padding: '8px 16px', border: '1px solid #CDE5FB' }}
+                >
+                  <img src={calendarIcon} alt="Calendar" className="w-3.5 h-4" />
+                  {startDate ? startDate.toLocaleDateString() : 'Start Date'}
+                  <ChevronDown size={14} />
+                </button>
+              }
+            />
             
-            <button 
-              className="flex items-center gap-2 bg-white rounded-lg text-xs font-medium text-[#000000] hover:bg-gray-50 transition-colors duration-200"
-              style={{ padding: '8px 16px', border: '1px solid #CDE5FB' }}
-            >
-              <img src={calendarIcon} alt="Calendar" className="w-3.5 h-4" />
-              End Date
-              <ChevronDown size={14} />
-            </button>
+            <DatePicker
+              selected={endDate}
+              onChange={(date) => setEndDate(date)}
+              placeholderText="End Date"
+              dateFormat="dd/MM/yyyy"
+              minDate={startDate}
+              customInput={
+                <button 
+                  className="flex items-center gap-2 bg-white rounded-lg text-xs font-medium text-[#000000] hover:bg-gray-50 transition-colors duration-200"
+                  style={{ padding: '8px 16px', border: '1px solid #CDE5FB' }}
+                >
+                  <img src={calendarIcon} alt="Calendar" className="w-3.5 h-4" />
+                  {endDate ? endDate.toLocaleDateString() : 'End Date'}
+                  <ChevronDown size={14} />
+                </button>
+              }
+            />
           </div>
         </div>
         <div className="h-[200px] md:h-[250px] w-full">
