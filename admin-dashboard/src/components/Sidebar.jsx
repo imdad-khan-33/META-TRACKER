@@ -1,4 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import authService from '../services/authService';
 import dashboardIcon from '../assets/dashboardicon.svg';
 import userIcon from '../assets/uil_user.svg';
 import rolesIconInner from '../assets/rolesicon-inner.svg';
@@ -18,7 +19,13 @@ const Sidebar = ({ closeSidebar }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // Get current user to check role
+  const currentUser = authService.getCurrentUser();
+  const userRole = currentUser?.role?.toLowerCase();
+
   const handleLogout = () => {
+    // Clear authentication data
+    authService.logout();
     // Redirect to login page
     navigate('/');
   };
@@ -26,9 +33,19 @@ const Sidebar = ({ closeSidebar }) => {
   const menuItems = [
     { name: 'Dashboard', icon: dashboardIcon, isCustom: true, path: '/dashboard' },
     { name: 'User', icon: userIcon, isCustom: true, path: '/user' },
-    { name: 'Roles', icon: 'roles', isCustom: false, path: '/roles' }, 
+    { name: 'Roles', icon: 'roles', isCustom: false, path: '/roles', allowedRoles: ['super_admin', 'admin', 'platform_staff'] }, 
     { name: 'Support', icon: supportIcon, isCustom: true, path: '/support' },
   ];
+
+  // Filter menu items based on user role
+  const filteredMenuItems = menuItems.filter(item => {
+    // If item has allowedRoles, check if user's role is in the list
+    if (item.allowedRoles) {
+      return item.allowedRoles.includes(userRole);
+    }
+    // If no allowedRoles specified, show to everyone
+    return true;
+  });
 
   return (
     <div className="w-64 lg:w-64 h-full bg-[#2E73E3] text-white flex flex-col overflow-y-auto">
@@ -36,7 +53,7 @@ const Sidebar = ({ closeSidebar }) => {
       <div className="flex-1 py-6">
         {/* Menu Items */}
         <nav className="space-y-2 px-4">
-          {menuItems.map((item) => {
+          {filteredMenuItems.map((item) => {
             const isActive = location.pathname === item.path;
             
             return (

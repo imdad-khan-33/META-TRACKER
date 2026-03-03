@@ -4,7 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import { LineChart, Line, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 const UserDetails = () => {
-  const { id } = useParams();
+  const { id: _id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('ad-spends');
 
@@ -138,8 +138,8 @@ const UserDetails = () => {
       <div className="bg-white rounded-lg border border-[#CFDBE8] shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-200 bg-[#CFDBE8]">
+            <thead >
+              <tr className="border-b border-gray-200 bg-[#F7FAFC]">
                 <th className="text-left py-3 px-4 text-sm font-semibold text-[#000000]">Date</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-[#000000]">Platform</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-[#000000]">Amount</th>

@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import authService from '../services/authService';
 import loginImage from '../assets/login.png';
 import emailIcon from '../assets/email-icon.svg';
 import passwordIcon from '../assets/password-icon.svg';
@@ -9,13 +10,37 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-  
-    if (email && password) {
+  // Check if user is already authenticated
+  useEffect(() => {
+    if (authService.isAuthenticated()) {
       navigate('/dashboard');
+    }
+  }, [navigate]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+  
+    try {
+      const result = await authService.login(email, password);
+      
+      if (result.success) {
+        // Login successful - navigate to dashboard
+        navigate('/dashboard');
+      } else {
+        // Login failed - show error message
+        setError(result.message || 'Invalid email or password');
+      }
+    } catch (err) {
+      setError('An unexpected error occurred. Please try again.');
+      console.error('Login error:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -86,7 +111,7 @@ const Login = () => {
               </button>
             </div>
 
-            {/* Remember Me */}
+            {/* Remember Me & Forgot Password */}
             <div className="flex items-center justify-between w-full">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -95,14 +120,42 @@ const Login = () => {
                 />
                 <span className="text-sm text-gray-600">Remember me</span>
               </label>
+              <a
+                href="/forgot-password"
+                className="text-sm text-[#2E73E3] hover:text-[#2563EB] font-medium"
+              >
+                Forgot Password?
+              </a>
             </div>
+
+            {/* Error Message */}
+            {error && (
+              <div className="w-full bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
 
             {/* Login Button */}
             <button
               type="submit"
-              className="w-full bg-[#2E73E3] text-white font-medium py-3 rounded-lg hover:bg-[#2563EB] transition-all duration-200 text-base mt-5 cursor-pointer shadow-md hover:shadow-lg"
+              disabled={loading}
+              className={`w-full bg-[#2E73E3] text-white font-medium py-3 rounded-lg transition-all duration-200 text-base mt-5 shadow-md hover:shadow-lg ${
+                loading 
+                  ? 'opacity-70 cursor-not-allowed' 
+                  : 'hover:bg-[#2563EB] cursor-pointer'
+              }`}
             >
-              Log in
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Logging in...
+                </span>
+              ) : (
+                'Log in'
+              )}
             </button>
 
             {/* Info Text */}
