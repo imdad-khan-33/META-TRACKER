@@ -82,6 +82,26 @@ const userService = {
     }
   },
 
+  // Get all clients
+  getAllClients: async () => {
+    try {
+      const response = await api.get('/api/auth/all-clients');
+      return {
+        success: true,
+        clients: response.data?.clients || [],
+        data: response.data,
+      };
+    } catch (error) {
+      console.error('Failed to fetch clients:', error.response?.data || error.message);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to fetch clients',
+        clients: [],
+        error: error,
+      };
+    }
+  },
+
   // Toggle platform user active status (enable/disable)
   togglePlatformUserStatus: async (userId) => {
     try {

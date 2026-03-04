@@ -1,7 +1,7 @@
 
 const config = {
   // API Configuration
-  apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'http://72.62.241.45:4000',
+  apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'https://api.track2gram.com/',
   
   // Admin Credentials
 
