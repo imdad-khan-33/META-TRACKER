@@ -1,15 +1,19 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { LineChart, Line, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import userService from '../services/userService';
 
 const UserDetails = () => {
   const { id: _id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('ad-spends');
+  const [spendOverview, setSpendOverview] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [clientData, setClientData] = useState(null);
 
   // Sample spend data for chart
-  const spendData = [
+  const defaultChartData = [
     { month: 'Jan', value: 8000 },
     { month: 'Feb', value: 10000 },
     { month: 'Mar', value: 7500 },
@@ -19,14 +23,92 @@ const UserDetails = () => {
     { month: 'Jul', value: 12000 },
   ];
 
+  // Fetch client details to get workspace ID
+  useEffect(() => {
+    const fetchClientData = async () => {
+      try {
+        const result = await userService.getAllClients();
+        if (result.success) {
+          const client = result.clients.find(c => c._id === _id);
+          if (client) {
+            setClientData(client);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching client data:', error);
+      }
+    };
+
+    if (_id) {
+      fetchClientData();
+    }
+  }, [_id]);
+
+  // Fetch spend overview data from API
+  useEffect(() => {
+    const fetchSpendData = async () => {
+      setLoading(true);
+      try {
+        // Use the workspace ID from client data or fallback to user ID
+        const workspaceId = clientData?.workspaceId || _id;
+        
+        // Calculate date range (last 30 days)
+        const endDate = new Date();
+        const startDate = new Date(endDate.getTime() - (30 * 24 * 60 * 60 * 1000));
+        
+        const formatDate = (date) => date.toISOString().split('T')[0];
+        
+        const response = await userService.getSpendOverview(
+          workspaceId,
+          formatDate(startDate),
+          formatDate(endDate),
+          'all'
+        );
+
+        if (response.success) {
+          console.log('Full Spend Overview Response:', response);
+          console.log('Cards Data:', response?.data?.cards);
+          console.log('Total Ad Spend Value:', response?.data?.cards?.totalAdSpend);
+          setSpendOverview(response);
+        } else {
+          console.error('Failed to fetch spend overview:', response.message);
+          setSpendOverview(null);
+        }
+      } catch (error) {
+        console.error('Error fetching spend overview:', error);
+        setSpendOverview(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (clientData || _id) {
+      fetchSpendData();
+    }
+  }, [clientData, _id]);
+
   // Sample transaction data
   const transactions = [
-    { date: '2024-07-15', platform: 'Google Ads', amount: '$500', status: 'Success' },
-    { date: '2024-07-10', platform: 'Meta Ads', amount: '$300', status: 'Success' },
-    { date: '2024-07-05', platform: 'Google Ads', amount: '$200', status: 'Pending' },
-    { date: '2024-06-30', platform: 'Meta Ads', amount: '$150', status: 'Failed' },
-    { date: '2024-06-25', platform: 'Google Ads', amount: '$400', status: 'Success' },
+    { date: '2024-07-15', platform: 'Google Ads', amount: '500 pkr', status: 'Success' },
+    { date: '2024-07-10', platform: 'Meta Ads', amount: '300 pkr', status: 'Success' },
+    { date: '2024-07-05', platform: 'Google Ads', amount: '200 pkr', status: 'Pending' },
+    { date: '2024-06-30', platform: 'Meta Ads', amount: '150 pkr', status: 'Failed' },
+    { date: '2024-06-25', platform: 'Google Ads', amount: '400 pkr', status: 'Success' },
   ];
+
+  // Get chart data from API or use defaults
+  const chartData = spendOverview?.data?.chart?.series || defaultChartData;
+  const totalAdSpendValue = spendOverview?.data?.cards?.totalAdSpend;
+  const googleAdsSpendValue = spendOverview?.data?.cards?.googleAdsSpend;
+  const metaAdsSpendValue = spendOverview?.data?.cards?.metaAdsSpend;
+  
+  console.log('Display Values:', { totalAdSpendValue, googleAdsSpendValue, metaAdsSpendValue });
+  
+  const totalSpend = `${totalAdSpendValue || 0} pkr`;
+  const googleSpend = `${googleAdsSpendValue || 0} pkr`;
+  const metaSpend = `${metaAdsSpendValue || 0} pkr`;
+  const overviewAmount = `${spendOverview?.data?.overview?.totalSpend || 0} pkr`;
+  const percentageChange = `${spendOverview?.data?.overview?.changePercent || 0}%`;
 
   return (
     <div className="max-w-[1400px] mx-auto">
@@ -87,15 +169,21 @@ const UserDetails = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-[#CDE5FB] p-6 rounded-lg border border-[#D9EAFD]">
           <h3 className="font-medium text-[#0D141C] mb-2" style={{ fontFamily: 'Inter', fontSize: '16px', lineHeight: '24px', letterSpacing: '0px' }}>Total Ad Spend</h3>
-          <p className="font-bold text-[#000000]" style={{ fontFamily: 'Inter', fontSize: '24px', lineHeight: '30px', letterSpacing: '0px' }}>0</p>
+          <p className="font-bold text-[#000000]" style={{ fontFamily: 'Inter', fontSize: '24px', lineHeight: '30px', letterSpacing: '0px' }}>
+            {loading ? 'Loading...' : totalSpend}
+          </p>
         </div>
         <div className="bg-[#CDE5FB] p-6 rounded-lg border border-[#D9EAFD]">
           <h3 className="font-medium text-[#0D141C] mb-2" style={{ fontFamily: 'Inter', fontSize: '16px', lineHeight: '24px', letterSpacing: '0px' }}>Google Ads Spend</h3>
-          <p className="font-bold text-[#000000]" style={{ fontFamily: 'Inter', fontSize: '24px', lineHeight: '30px', letterSpacing: '0px' }}>0</p>
+          <p className="font-bold text-[#000000]" style={{ fontFamily: 'Inter', fontSize: '24px', lineHeight: '30px', letterSpacing: '0px' }}>
+            {loading ? 'Loading...' : googleSpend}
+          </p>
         </div>
         <div className="bg-[#CDE5FB] p-6 rounded-lg border border-[#D9EAFD]">
           <h3 className="font-medium text-[#0D141C] mb-2" style={{ fontFamily: 'Inter', fontSize: '16px', lineHeight: '24px', letterSpacing: '0px' }}>Meta Ads Spend</h3>
-          <p className="font-bold text-[#000000]" style={{ fontFamily: 'Inter', fontSize: '24px', lineHeight: '30px', letterSpacing: '0px' }}>0</p>
+          <p className="font-bold text-[#000000]" style={{ fontFamily: 'Inter', fontSize: '24px', lineHeight: '30px', letterSpacing: '0px' }}>
+            {loading ? 'Loading...' : metaSpend}
+          </p>
         </div>
       </div>
 
@@ -103,12 +191,22 @@ const UserDetails = () => {
       <div className="bg-white p-6 rounded-lg border border-[#D9EAFD] shadow-sm mb-8">
         <div className="mb-4">
           <h3 className="font-medium text-[#0D141C]" style={{ fontFamily: 'Inter', fontSize: '16px', lineHeight: '24px', letterSpacing: '0px' }}>Spend Overview</h3>
-          <p className="font-bold text-[#0D141C]" style={{ fontFamily: 'Inter', fontSize: '32px', lineHeight: '40px', letterSpacing: '0px' }}>$12,500</p>
-          <p className="text-sm text-[#61698A] mt-1">Last 30 Days <span className="text-[#0AD966] font-bold">+15%</span></p>
+          <p className="font-bold text-[#0D141C]" style={{ fontFamily: 'Inter', fontSize: '32px', lineHeight: '40px', letterSpacing: '0px' }}>
+            {loading ? 'Loading...' : overviewAmount}
+          </p>
+          <p className="text-sm text-[#61698A] mt-1">
+            Last 30 Days{' '}
+            <span className="text-[#0AD966] font-bold">
+              {loading ? 'Loading...' : percentageChange}
+            </span>
+          </p>
         </div>
         <div className="h-[250px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={spendData} margin={{ left: 0, right: 10, top: 10, bottom: 0 }}>
+            <LineChart 
+              data={chartData && Array.isArray(chartData) ? chartData : defaultChartData} 
+              margin={{ left: 0, right: 10, top: 10, bottom: 0 }}
+            >
               <Tooltip 
                 contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
               />

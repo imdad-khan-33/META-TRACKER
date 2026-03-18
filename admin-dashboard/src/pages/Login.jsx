@@ -4,7 +4,7 @@ import authService from '../services/authService';
 import loginImage from '../assets/login.png';
 import emailIcon from '../assets/email-icon.svg';
 import passwordIcon from '../assets/password-icon.svg';
-import logo from '../assets/admin-logo.svg';
+import logo from '../assets/main-logo.svg';
 
 const Login = () => {
   const [email, setEmail] = useState('');

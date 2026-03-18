@@ -1,18 +1,60 @@
 import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import userService from '../services/userService';
 
 const UserTable = () => {
   const navigate = useNavigate();
-  const users = [
-    { name: 'Liam Carter', plan: 'Pro', start: '2023-01-15', end: '2024-01-15', status: 'Active' },
-    { name: 'Olivia Bennett', plan: 'Basic', start: '2023-02-20', end: '2024-02-20', status: 'Active' },
-    { name: 'Noah Thompson', plan: 'Enterprise', start: '2023-03-25', end: '2024-03-25', status: 'Active' },
-    { name: 'Ava Harper', plan: 'Premium', start: '2023-04-30', end: '2024-04-30', status: 'Active' },
-    { name: 'Ethan Parker', plan: 'Pro', start: '2023-05-05', end: '2024-05-05', status: 'Active' },
-    { name: 'Isabella Foster', plan: 'Basic', start: '2023-06-10', end: '2024-06-10', status: 'Active' },
-    { name: 'Mason Reed', plan: 'Enterprise', start: '2023-07-15', end: '2024-07-15', status: 'Active' },
-    { name: 'Sophia Hayes', plan: 'Premium', start: '2023-08-20', end: '2024-08-20', status: 'Active' },
-   
-  ];
+  const [clients, setClients] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [processingId, setProcessingId] = useState(null);
+  const [clientStatus, setClientStatus] = useState({});
+
+  // Fetch users from API
+  useEffect(() => {
+    const fetchClients = async () => {
+      setLoading(true);
+      try {
+        const result = await userService.getAllClients();
+        if (result.success) {
+          // Limit to first 10 for dashboard preview
+          const limitedClients = result.clients.slice(0, 10);
+          setClients(limitedClients);
+          
+          // Initialize status map
+          const statusMap = {};
+          limitedClients.forEach((client) => {
+            statusMap[client._id] = client.status !== false;
+          });
+          setClientStatus(statusMap);
+        }
+      } catch (err) {
+        console.error('Failed to load clients');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchClients();
+  }, []);
+
+  const handleStatusToggle = async (clientId, workspaceId, currentStatus) => {
+    setProcessingId(clientId);
+    try {
+      const newStatus = !currentStatus;
+      // Use toggleWorkspaceStatus with workspaceId
+      const response = await userService.toggleWorkspaceStatus(workspaceId, newStatus);
+      
+      if (response.success) {
+        setClientStatus((prevStatus) => ({
+          ...prevStatus,
+          [clientId]: newStatus,
+        }));
+      }
+    } catch (err) {
+      console.error('Error updating status:', err);
+    } finally {
+      setProcessingId(null);
+    }
+  };
 
   return (
     <div className="bg-[#FFFFFF] rounded-[8px] border border-[#D9EAFD] shadow-sm overflow-hidden">
@@ -41,24 +83,56 @@ const UserTable = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-[#2E73E3]">
-            {users.map((user, index) => (
-              <tr key={index} className="hover:bg-gray-50 transition-colors text-[#000000] text-[12px] md:text-[14px]">
-                <td className="px-3 md:px-4 py-3 md:py-4">{user.name}</td>
-                <td className="px-3 md:px-6 py-3 md:py-4">{user.plan}</td>
-                <td className="px-3 md:px-6 py-3 md:py-4">{user.start}</td>
-                <td className="px-3 md:px-6 py-3 md:py-4">{user.end}</td>
-                <td className="px-3 md:px-6 py-3 md:py-4">
-                  <span className="bg-[#CDE5FB] text-[#3B82F6] px-2 md:px-4 py-1 rounded-[6px] text-[10px] md:text-[12px] font-bold">
-                    {user.status}
-                  </span>
-                </td>
-                <td className="px-3 md:px-6 py-3 md:py-4">
-                  <button className="   font-bold text-[#000000] cursor-pointer hover:underline text-[10px] md:text-[12px]">
-                    Revoke
-                  </button>
+            {loading ? (
+              <tr>
+                <td colSpan="6" className="px-3 md:px-6 py-8 text-center text-sm text-[#61698A]">
+                  Loading...
                 </td>
               </tr>
-            ))}
+            ) : clients.length === 0 ? (
+              <tr>
+                <td colSpan="6" className="px-3 md:px-6 py-8 text-center text-sm text-[#61698A]">
+                  No clients found
+                </td>
+              </tr>
+            ) : (
+              clients.map((client) => {
+                const isActive = clientStatus[client._id] !== false;
+                return (
+                  <tr key={client._id} className="hover:bg-gray-50 transition-colors text-[#000000] text-[12px] md:text-[14px]">
+                    <td className="px-3 md:px-4 py-3 md:py-4">{client.name}</td>
+                    <td className="px-3 md:px-6 py-3 md:py-4">{client.plan || 'N/A'}</td>
+                    <td className="px-3 md:px-6 py-3 md:py-4">{client.startDate || 'N/A'}</td>
+                    <td className="px-3 md:px-6 py-3 md:py-4">{client.endDate || 'N/A'}</td>
+                    <td className="px-3 md:px-6 py-3 md:py-4">
+                      <span className={`px-2 md:px-4 py-1 rounded-[6px] text-[10px] md:text-[12px] font-bold ${
+                        isActive 
+                          ? 'bg-[#CDE5FB] text-[#3B82F6]' 
+                          : 'bg-[#FFE5E5] text-[#E53E3E]'
+                      }`}>
+                        {isActive ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+                    <td className="px-3 md:px-6 py-3 md:py-4">
+                      <button 
+                        onClick={() => handleStatusToggle(client._id, client.workspaceId, isActive)}
+                        disabled={processingId === client._id}
+                        className={`font-bold cursor-pointer hover:underline text-[10px] md:text-[12px] transition-opacity ${
+                          processingId === client._id 
+                            ? 'opacity-50 cursor-not-allowed' 
+                            : ''
+                        } ${isActive ? 'text-[#000000]' : 'text-[#2E73E3]'}`}
+                      >
+                        {processingId === client._id 
+                          ? 'Processing...' 
+                          : (isActive ? 'Revoke' : 'Activate')
+                        }
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
           </tbody>
         </table>
       </div>

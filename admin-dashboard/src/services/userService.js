@@ -126,6 +126,40 @@ const userService = {
     }
   },
 
+  // Toggle workspace status (activate/deactivate user)
+  toggleWorkspaceStatus: async (workspaceId, status) => {
+    try {
+      console.log('Toggling Workspace Status...');
+      console.log('Workspace ID:', workspaceId);
+      console.log('Status:', status);
+      
+      // Use GET method with status as query parameter
+      const response = await api.get(
+        `/api/projects/platform/workspaces/${workspaceId}`,
+        {
+          params: {
+            status: status
+          }
+        }
+      );
+
+      console.log('Workspace Status Updated Successfully:', response.data);
+
+      return {
+        success: true,
+        message: response.data.message || 'Workspace status updated successfully',
+        data: response.data,
+      };
+    } catch (error) {
+      console.error('Failed to toggle workspace status:', error.response?.data || error.message);
+      return {
+        success: true,
+        message: error.response?.data?.message || 'Failed to toggle workspace status',
+        error: error,
+      };
+    }
+  },
+
   // Delete user
   deleteUser: async (userId) => {
     try {
@@ -146,6 +180,65 @@ const userService = {
       return {
         success: false,
         message: error.response?.data?.message || 'Failed to delete user',
+        error: error,
+      };
+    }
+  },
+
+  // Update workspace status (activate/deactivate)
+  updateWorkspaceStatus: async (workspaceId, status) => {
+    try {
+      console.log('Updating Workspace Status...');
+      console.log('Workspace ID:', workspaceId);
+      console.log('Status:', status);
+      
+      // Try POST method instead of PUT
+      const response = await api.post(`/api/auth/platform/workspaces/${workspaceId}/status`, {}, {
+        params: {
+          status: status,
+        }
+      });
+
+      console.log('Workspace Status Updated Successfully:', response.data);
+
+      return {
+        success: true,
+        message: response.data.message || 'Workspace status updated successfully',
+        data: response.data,
+      };
+    } catch (error) {
+      console.error('Failed to update workspace status:', error.response?.data || error.message);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to update workspace status',
+        error: error,
+      };
+    }
+  },
+
+  // Get spend overview for a workspace
+  getSpendOverview: async (workspaceId, startDate, endDate, platform = 'all') => {
+    try {
+      const response = await api.get(
+        `/api/projects/platform/workspaces/${workspaceId}/spend-overview`,
+        {
+          params: {
+            startDate: startDate,
+            endDate: endDate,
+            platform: platform
+          }
+        }
+      );
+
+      // API returns { success: true, data: { cards: {...}, chart: {...}, ... } }
+      // Return it as-is to avoid double-nesting
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch spend overview:', error.response?.data || error.message);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to fetch spend overview',
+        data: null,
         error: error,
       };
     }

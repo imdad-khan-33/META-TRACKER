@@ -29,7 +29,7 @@ const DashboardCharts = () => {
           <div className="flex-1">
             <h3 className="text-[#000000] font-bold text-[16px] md:text-[18px] mb-1">Sales Over Time</h3>
             <div className="flex flex-col gap-1">
-              <span className="text-[32px] font-bold text-[#000000] leading-[40px] tracking-[0px]">$123,456</span>
+              <span className="text-[32px] font-bold text-[#000000] leading-[40px] tracking-[0px]">123,456 pkr</span>
               <div className="flex items-center gap-2 mt-2">
                 <span className="text-[#A9ADC1] text-[14px] md:text-[16px] font-medium">Last 30 Days</span>
                 <span className="text-[#0AD966] text-[14px] md:text-[16px] font-bold">+15%</span>

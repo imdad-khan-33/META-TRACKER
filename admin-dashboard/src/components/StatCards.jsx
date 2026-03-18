@@ -12,7 +12,7 @@ const StatCards = () => {
   const stats = [
     { title: 'Total Subscriptions', value: '1,234', change: '+12%', isPositive: true },
     { title: 'Customers', value: '1,024', change: '+10%', isPositive: true },
-    { title: 'Revenue', value: '$123,456', change: '+15%', isPositive: true },
+    { title: 'Revenue', value: '123,456 pkr', change: '+15%', isPositive: true },
     { title: 'New Subscriptions', value: '123', change: '+5%', isPositive: true },
   ];
 

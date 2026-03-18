@@ -115,7 +115,7 @@ const AcceptInvite = () => {
       }
     } catch (err) {
       setError('Something went wrong. Please try again.');
-      console.error('❌ Unexpected error:', err);
+      console.error(' Unexpected error:', err);
     } finally {
       setLoading(false);
     }

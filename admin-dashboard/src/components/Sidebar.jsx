@@ -48,7 +48,7 @@ const Sidebar = ({ closeSidebar }) => {
   });
 
   return (
-    <div className="w-64 lg:w-64 h-full bg-[#2E73E3] text-white flex flex-col overflow-y-auto">
+    <div className="w-64 lg:w-64 h-full bg-[#084B8A] text-white flex flex-col overflow-y-auto">
       {/* Sidebar Content */}
       <div className="flex-1 py-6">
         {/* Menu Items */}
