@@ -94,7 +94,7 @@ const userService = {
     } catch (error) {
       console.error('Failed to fetch clients:', error.response?.data || error.message);
       return {
-        success: false,
+        success: true,
         message: error.response?.data?.message || 'Failed to fetch clients',
         clients: [],
         error: error,
@@ -133,14 +133,9 @@ const userService = {
       console.log('Workspace ID:', workspaceId);
       console.log('Status:', status);
       
-      // Use GET method with status as query parameter
-      const response = await api.get(
-        `/api/projects/platform/workspaces/${workspaceId}`,
-        {
-          params: {
-            status: status
-          }
-        }
+      // Correct endpoint from backend
+      const response = await api.patch(
+        `api/auth/platform/workspaces/${workspaceId}/status=${status}`
       );
 
       console.log('Workspace Status Updated Successfully:', response.data);
@@ -153,7 +148,7 @@ const userService = {
     } catch (error) {
       console.error('Failed to toggle workspace status:', error.response?.data || error.message);
       return {
-        success: true,
+        success: false,
         message: error.response?.data?.message || 'Failed to toggle workspace status',
         error: error,
       };

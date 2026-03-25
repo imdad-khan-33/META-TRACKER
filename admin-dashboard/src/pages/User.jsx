@@ -75,7 +75,7 @@ const User = () => {
   );
 
   return (
-    <div className="max-w-[1400px] mx-auto">
+    <div className="max-w-6xl mx-auto">
       <h1 className="text-xl md:text-2xl lg:text-[28px] font-bold text-[#000000] mb-6">User</h1>
       
       {/* Search Bar */}

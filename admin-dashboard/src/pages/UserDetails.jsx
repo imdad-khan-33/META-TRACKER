@@ -111,7 +111,7 @@ const UserDetails = () => {
   const percentageChange = `${spendOverview?.data?.overview?.changePercent || 0}%`;
 
   return (
-    <div className="max-w-[1400px] mx-auto">
+    <div className="max-w-6xl mx-auto">
       {/* Header with Back Button */}
       <div className="flex items-center gap-4 mb-6">
         <button
@@ -201,7 +201,7 @@ const UserDetails = () => {
             </span>
           </p>
         </div>
-        <div className="h-[250px] w-full">
+        <div className="h-64 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart 
               data={chartData && Array.isArray(chartData) ? chartData : defaultChartData} 
@@ -251,7 +251,7 @@ const UserDetails = () => {
                   <td className="py-4 px-4 text-sm text-[#0D141C]">{transaction.platform}</td>
                   <td className="py-4 px-4 text-sm text-[#4D7399]">{transaction.amount}</td>
                   <td className="py-4 px-4">
-                    <span className={`inline-flex items-center justify-center px-4 h-8 w-[145px] rounded-lg text-xs font-bold ${
+                    <span className={`inline-flex items-center justify-center px-4 h-8 rounded-lg text-xs font-bold ${
                       transaction.status === 'Success' ? 'bg-[#088740] text-[#FFFFFF] cursor-pointer' :
                       transaction.status === 'Pending' ? 'bg-[#8CB3DA] text-[#FFFFFF] cursor-pointer' :
                       'bg-[#E83D08] text-[#FFFFFF] cursor-pointer'

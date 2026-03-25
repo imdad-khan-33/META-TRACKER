@@ -27,7 +27,7 @@ const UserTable = () => {
           });
           setClientStatus(statusMap);
         }
-      } catch (err) {
+      } catch (error) {
         console.error('Failed to load clients');
       } finally {
         setLoading(false);
@@ -44,10 +44,18 @@ const UserTable = () => {
       const response = await userService.toggleWorkspaceStatus(workspaceId, newStatus);
       
       if (response.success) {
+        // Update clientStatus for UI display
         setClientStatus((prevStatus) => ({
           ...prevStatus,
           [clientId]: newStatus,
         }));
+        
+        // Also update clients array to persist status on refresh
+        setClients((prevClients) =>
+          prevClients.map((client) =>
+            client._id === clientId ? { ...client, status: newStatus } : client
+          )
+        );
       }
     } catch (err) {
       console.error('Error updating status:', err);
@@ -57,7 +65,7 @@ const UserTable = () => {
   };
 
   return (
-    <div className="bg-[#FFFFFF] rounded-[8px] border border-[#D9EAFD] shadow-sm overflow-hidden">
+    <div className="bg-[#FFFFFF] rounded-lg border border-[#D9EAFD] shadow-sm overflow-hidden">
       {/* View More Button - Moved to Top */}
       <div className="flex justify-end px-4 md:px-6 py-3 md:py-4 border-b border-[#D9EAFD]">
         <button 
@@ -71,7 +79,7 @@ const UserTable = () => {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full text-left min-w-[640px]">
+        <table className="w-full text-left">
           <thead>
             <tr className="border-b border-[#D9EAFD] text-[#000000] text-[11px] md:text-[13px] font-medium">
               <th className="px-3 md:px-6 py-3 md:py-4">Name</th>
@@ -105,7 +113,7 @@ const UserTable = () => {
                     <td className="px-3 md:px-6 py-3 md:py-4">{client.startDate || 'N/A'}</td>
                     <td className="px-3 md:px-6 py-3 md:py-4">{client.endDate || 'N/A'}</td>
                     <td className="px-3 md:px-6 py-3 md:py-4">
-                      <span className={`px-2 md:px-4 py-1 rounded-[6px] text-[10px] md:text-[12px] font-bold ${
+                      <span className={`px-2 md:px-4 py-1 rounded-md text-[10px] md:text-[12px] font-bold ${
                         isActive 
                           ? 'bg-[#CDE5FB] text-[#3B82F6]' 
                           : 'bg-[#FFE5E5] text-[#E53E3E]'
