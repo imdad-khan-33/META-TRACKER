@@ -2,6 +2,21 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import userService from '../services/userService';
 
+// Format ISO date to readable format
+const formatDate = (dateString) => {
+  if (!dateString) return 'N/A';
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    });
+  } catch {
+    return 'N/A';
+  }
+};
+
 const UserTable = () => {
   const navigate = useNavigate();
   const [clients, setClients] = useState([]);
@@ -110,8 +125,8 @@ const UserTable = () => {
                   <tr key={client._id} className="hover:bg-gray-50 transition-colors text-[#000000] text-[12px] md:text-[14px]">
                     <td className="px-3 md:px-4 py-3 md:py-4">{client.name}</td>
                     <td className="px-3 md:px-6 py-3 md:py-4">{client.plan || 'N/A'}</td>
-                    <td className="px-3 md:px-6 py-3 md:py-4">{client.startDate || 'N/A'}</td>
-                    <td className="px-3 md:px-6 py-3 md:py-4">{client.endDate || 'N/A'}</td>
+                    <td className="px-3 md:px-6 py-3 md:py-4">{formatDate(client?.workspace?.startDate)}</td>
+                    <td className="px-3 md:px-6 py-3 md:py-4">{formatDate(client?.workspace?.endDate)}</td>
                     <td className="px-3 md:px-6 py-3 md:py-4">
                       <span className={`px-2 md:px-4 py-1 rounded-md text-[10px] md:text-[12px] font-bold ${
                         isActive 
