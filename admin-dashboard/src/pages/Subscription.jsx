@@ -18,6 +18,7 @@ const Subscription = () => {
       const formatted = [
         { name: "Starter", key: "starter", price: data.starter },
         { name: "Pro", key: "pro", price: data.pro },
+        { name: "Yearly", key: "yearly", price: data.yearly },
       ];
 
       setPlans(formatted);
@@ -43,6 +44,7 @@ const Subscription = () => {
     let updated = {
       starter: plans.find((p) => p.key === "starter")?.price,
       pro: plans.find((p) => p.key === "pro")?.price,
+      yearly: plans.find((p) => p.key === "yearly")?.price,
     };
 
     updated[selectedPlan.key] = Number(newPrice);

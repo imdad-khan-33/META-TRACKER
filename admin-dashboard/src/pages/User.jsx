@@ -1,9 +1,52 @@
-import { Search } from 'lucide-react';
+import { BadgePlus, LogIn, Search, ShieldOff, UserCheck } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Modal, Select, Button } from 'antd';
 import userService from '../services/userService';
 import assignplanService from '../services/assignplanService';
+
+const formatPlan = (plan) => {
+  const normalized = String(plan || 'none').toLowerCase();
+  if (normalized === 'pro') return 'Pro';
+  if (normalized === 'starter') return 'Starter';
+  if (normalized === 'yearly') return 'Yearly';
+  return 'No Plan';
+};
+
+const planClassName = (plan) => {
+  const normalized = String(plan || 'none').toLowerCase();
+  if (normalized === 'none' || !normalized) return 'bg-gray-100 text-[#61698A]';
+  return 'bg-[#DCFCE7] text-[#088740]';
+};
+
+const formatTool = (tool) => {
+  const normalized = String(tool || '').toLowerCase();
+  if (normalized === 'google_tracker') return 'Google';
+  if (normalized === 'meta_tracker') return 'Meta';
+  if (normalized === 'both') return 'Google + Meta';
+  return 'N/A';
+};
+
+const formatDate = (value) => {
+  if (!value) return 'N/A';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return 'N/A';
+  return date.toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+};
+
+const isPlanActive = (client) => {
+  const workspace = client.workspace || {};
+  const status = String(workspace.subscriptionStatus || '').toLowerCase();
+  const plan = String(workspace.planType || client.planType || client.plan || 'none').toLowerCase();
+  const expiresAt = workspace.endDate || workspace.subscriptionExpiresAt;
+  const isExpired = expiresAt ? new Date(expiresAt).getTime() < Date.now() : false;
+
+  return status === 'active' && plan !== 'none' && !isExpired;
+};
 
 const User = () => {
   const navigate = useNavigate();
@@ -12,6 +55,7 @@ const User = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [processingId, setProcessingId] = useState(null);
+  const [impersonatingId, setImpersonatingId] = useState(null);
   const [clientStatus, setClientStatus] = useState({});
   const [isAlignPlanModalOpen, setIsAlignPlanModalOpen] = useState(false);
   const [selectedClientId, setSelectedClientId] = useState(null);
@@ -19,9 +63,18 @@ const User = () => {
 
   
   const [selectedClientWorkspaceId, setSelectedClientWorkspaceId] = useState(null);
-  const [planType, setPlanType] = useState(''); // 'starter' or 'pro'
+  const [planType, setPlanType] = useState('');
   const [starterPlan, setStarterPlan] = useState('');
   const [isSubmittingPlan, setIsSubmittingPlan] = useState(false);
+  const clientDashboardUrl =
+    import.meta.env.VITE_CLIENT_DASHBOARD_URL || 'http://localhost:5173';
+
+  const handlePlanTypeChange = (value) => {
+    setPlanType(value);
+    if (value !== 'starter') {
+      setStarterPlan('');
+    }
+  };
   
   // Fetch clients from API
   useEffect(() => {
@@ -37,7 +90,7 @@ const User = () => {
           // Initialize status map for clients
           const statusMap = {};
           result.clients.forEach((client) => {
-            statusMap[client._id] = client.status !== false; // true if active, false if deactivated
+            statusMap[client._id] = client.workspace?.status !== false; // true if active, false if deactivated
           });
           setClientStatus(statusMap);
         } else {
@@ -81,6 +134,38 @@ const User = () => {
     }
   };
 
+  const handleImpersonate = async (client) => {
+    const confirmed = window.confirm(`Login as ${client.name || client.email}? You will be redirected to the client dashboard.`);
+    if (!confirmed) return;
+
+    setImpersonatingId(client._id);
+    try {
+      const result = await userService.impersonateUser(client._id);
+
+      if (!result.success || !result.token || !result.user) {
+        alert(result.message || 'Failed to impersonate user');
+        return;
+      }
+
+      const impersonatedUser = {
+        ...result.user,
+        impersonated: true,
+        superAdminReturnUrl: window.location.origin,
+      };
+
+      const target = new URL('/impersonate', clientDashboardUrl);
+      target.searchParams.set('token', result.token);
+      target.searchParams.set('user', JSON.stringify(impersonatedUser));
+
+      window.location.href = target.toString();
+    } catch (err) {
+      console.error('Impersonation error:', err);
+      alert('An error occurred while impersonating the user');
+    } finally {
+      setImpersonatingId(null);
+    }
+  };
+
 const postplans = async (workspaceId) => {
     if (!planType) {
       alert('Please select a plan type');
@@ -96,7 +181,7 @@ const postplans = async (workspaceId) => {
     try {
       const planData = {
         planType: planType,
-        durationDays: 30,
+        durationDays: planType === 'yearly' ? 365 : 30,
         amount: 0,
         currency: 'USD',
         reason: 'Manual assignment by admin',
@@ -105,6 +190,8 @@ const postplans = async (workspaceId) => {
       // Add activeTool for starter plans
       if (planType === 'starter') {
         planData.activeTool = starterPlan;
+      } else {
+        planData.activeTool = 'both';
       }
 
       console.log('Submitting plan data:', planData);
@@ -168,7 +255,7 @@ const postplans = async (workspaceId) => {
   );
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="w-full max-w-none mx-auto">
       <h1 className="text-xl md:text-2xl lg:text-[28px] font-bold text-[#000000] mb-6">User</h1>
       
       {/* Search Bar */}
@@ -188,55 +275,61 @@ const postplans = async (workspaceId) => {
       {/* User Table */}
       <div className="bg-white rounded-lg border border-[#D9EAFD] shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full table-fixed">
             <thead>
               <tr className="border-b border-gray-200 bg-white">
-                <th className="text-left py-3 px-4 text-sm font-semibold text-[#000000]">Name</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-[#000000]">Email</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-[#000000]">Role</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-[#000000]">Status</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-[#000000]">Action</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[#000000] w-[15%]">Name</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[#000000] w-[24%]">Email</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[#000000] w-[9%]">Plan</th>
+            
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[#000000] w-[11%]">Expires</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[#000000] w-[8%]">Status</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[#000000] w-[33%]">Action</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="5" className="py-8 text-center text-sm text-[#61698A]">
+                  <td colSpan="6" className="py-8 text-center text-sm text-[#61698A]">
                     Loading clients...
                   </td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan="5" className="py-8 text-center text-sm text-red-500">
+                  <td colSpan="6" className="py-8 text-center text-sm text-red-500">
                     {error}
                   </td>
                 </tr>
               ) : filteredClients.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="py-8 text-center text-sm text-[#61698A]">
+                  <td colSpan="6" className="py-8 text-center text-sm text-[#61698A]">
                     {searchQuery ? 'No matching clients found.' : 'No clients found.'}
                   </td>
                 </tr>
               ) : (
                 filteredClients.map((client) => {
                   const isActive = clientStatus[client._id] !== false;
+                  const workspace = client.workspace || {};
+                  const planType = workspace.planType || client.planType || client.plan;
                   return (
                     <tr key={client._id} className="border-b border-gray-100 hover:bg-gray-50">
-                      <td className="py-4 px-4 text-sm">
+                      <td className="py-3 px-4 text-sm align-middle">
                         <button 
                           onClick={() => navigate(`/user-details/${client._id}`)}
-                          className="text-[#2E73E3] hover:underline cursor-pointer font-medium"
+                          className="text-[#2E73E3] hover:underline cursor-pointer font-medium truncate block max-w-full"
                         >
                           {client.name}
                         </button>
                       </td>
-                      <td className="py-4 px-4 text-sm text-[#61698A]">{client.email}</td>
-                      <td className="py-4 px-4">
-                        <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-[#CDE5FB] text-[#2E73E3] capitalize">
-                          {client.role}
+                      <td className="py-3 px-4 text-sm text-[#61698A] align-middle truncate">{client.email}</td>
+                      <td className="py-3 px-4 align-middle">
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold whitespace-nowrap ${planClassName(planType)}`}>
+                          {formatPlan(planType)}
                         </span>
                       </td>
-                      <td className="py-4 px-4">
+                      
+                      <td className="py-3 px-4 text-sm text-[#61698A] align-middle">{formatDate(workspace.endDate)}</td>
+                      <td className="py-3 px-4 align-middle">
                         <span className={`inline-flex items-center px-3 py-1 rounded-md text-xs font-medium ${
                           isActive 
                             ? 'bg-[#CDE5FB] text-[#2E73E3]' 
@@ -245,16 +338,18 @@ const postplans = async (workspaceId) => {
                           {isActive ? 'Active' : 'Inactive'}
                         </span>
                       </td>
-                      <td className="py-4 px-4">
+                      <td className="py-3 px-4 align-middle">
+                        <div className="flex flex-nowrap items-center gap-2">
                         <button 
                           onClick={() => handleStatusToggle(client._id, client.workspaceId, isActive)}
                           disabled={processingId === client._id}
-                          className={`text-sm font-bold hover:underline cursor-pointer transition-opacity ${
+                          className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-bold cursor-pointer transition-all whitespace-nowrap ${
                             processingId === client._id 
                               ? 'opacity-50 cursor-not-allowed' 
                               : ''
-                          } ${isActive ? 'text-[#000000]' : 'text-[#2E73E3]'}`}
+                          } ${isActive ? 'border-red-200 bg-red-50 text-red-600 hover:bg-red-100' : 'border-blue-200 bg-blue-50 text-[#2E73E3] hover:bg-blue-100'}`}
                         >
+                          {isActive ? <ShieldOff size={14} /> : <UserCheck size={14} />}
                           {processingId === client._id 
                             ? 'Processing...' 
                             : (isActive ? 'Revoke' : 'Activate')
@@ -264,10 +359,23 @@ const postplans = async (workspaceId) => {
                         {/* we add the another button */}
                         <button 
                           onClick={() => handleOpenAlignPlanModal(client._id)}
-                          className='text-sm font-bold hover:underline cursor-pointer transition-opacity ml-4 text-[#2E73E3]'
+                          className='inline-flex items-center gap-1.5 rounded-lg border border-blue-200 bg-white px-2.5 py-1.5 text-xs font-bold text-[#2E73E3] cursor-pointer transition-all hover:bg-blue-50 whitespace-nowrap'
                         >
+                          <BadgePlus size={14} />
                           Assign Plan
                         </button>
+
+                        <button
+                          onClick={() => handleImpersonate(client)}
+                          disabled={impersonatingId === client._id}
+                          className={`inline-flex items-center gap-1.5 rounded-lg border border-green-200 bg-green-50 px-2.5 py-1.5 text-xs font-bold text-[#088740] cursor-pointer transition-all hover:bg-green-100 whitespace-nowrap ${
+                            impersonatingId === client._id ? 'opacity-50 cursor-not-allowed' : ''
+                          }`}
+                        >
+                          <LogIn size={14} />
+                          {impersonatingId === client._id ? 'Logging in...' : 'Impersonate'}
+                        </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -307,13 +415,14 @@ const postplans = async (workspaceId) => {
               Select Plan Type
             </label>
             <Select
-              placeholder="Choose Starter or Pro"
+              placeholder="Choose a plan"
               value={planType}
-              onChange={setPlanType}
+              onChange={handlePlanTypeChange}
               className="w-full"
               options={[
                 { label: 'Starter', value: 'starter' },
                 { label: 'Pro', value: 'pro' },
+                { label: 'Yearly', value: 'yearly' },
               ]}
             />
           </div>
@@ -340,12 +449,14 @@ const postplans = async (workspaceId) => {
             </div>
           )}
 
-          {/* Pro Plan Info */}
-          {planType === 'pro' && (
+          {/* Full Access Plan Info */}
+          {(planType === 'pro' || planType === 'yearly') && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-sm font-semibold text-[#2E73E3] mb-2">Pro Plan</p>
+              <p className="text-sm font-semibold text-[#2E73E3] mb-2">
+                {planType === 'yearly' ? 'Yearly Plan' : 'Pro Plan'}
+              </p>
               <p className="text-xs text-gray-600">
-                Pro plan includes access to all available tools and features. No tool limitation.
+                This plan includes access to all available tools and features. No tool limitation.
               </p>
             </div>
           )}
@@ -361,7 +472,7 @@ const postplans = async (workspaceId) => {
                 </div>
                 <div className="flex justify-between">
                   <span>Duration:</span>
-                  <span className="font-medium">30 days</span>
+                  <span className="font-medium">{planType === 'yearly' ? '365 days' : '30 days'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Amount:</span>

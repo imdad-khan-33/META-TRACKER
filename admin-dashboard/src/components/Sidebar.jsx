@@ -19,7 +19,7 @@ const RolesIcon = () => (
   </div>
 );
 
-const Sidebar = ({ closeSidebar }) => {
+const Sidebar = ({ closeSidebar, collapsed = false }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -83,11 +83,11 @@ const Sidebar = ({ closeSidebar }) => {
   });
 
   return (
-    <div className="w-64 lg:w-64 h-full bg-[#084B8A] text-white flex flex-col overflow-y-auto">
+    <div className={`${collapsed ? 'w-20' : 'w-64'} h-full bg-[#084B8A] text-white flex flex-col overflow-y-auto transition-all duration-300`}>
       {/* Sidebar Content */}
       <div className="flex-1 py-6">
         {/* Menu Items */}
-        <nav className="space-y-2 px-4">
+        <nav className={`space-y-2 ${collapsed ? 'px-3' : 'px-4'}`}>
           {filteredMenuItems.map((item) => {
             const isActive = location.pathname === item.path;
             
@@ -96,7 +96,8 @@ const Sidebar = ({ closeSidebar }) => {
                 key={item.name}
                 to={item.path}
                 onClick={closeSidebar}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                title={collapsed ? item.name : undefined}
+                className={`w-full flex items-center ${collapsed ? 'justify-center px-0' : 'gap-3 px-4'} py-3 rounded-lg transition-all duration-200 ${
                   isActive 
                     ? 'bg-white/20 shadow-lg' 
                     : 'hover:bg-white/10'
@@ -113,7 +114,11 @@ const Sidebar = ({ closeSidebar }) => {
                     <img src={item.icon} alt={item.name} className="w-5 h-5 object-contain" />
                   </div>
                 )}
-                <span style={{ fontFamily: 'Inter', fontWeight: 500, fontSize: '14px', lineHeight: '21px', letterSpacing: '0px' }}>{item.name}</span>
+                {!collapsed && (
+                  <span style={{ fontFamily: 'Inter', fontWeight: 500, fontSize: '14px', lineHeight: '21px', letterSpacing: '0px' }}>
+                    {item.name}
+                  </span>
+                )}
               </Link>
             );
           })}
@@ -121,10 +126,18 @@ const Sidebar = ({ closeSidebar }) => {
       </div>
 
       {/* Logout Button at Bottom */}
-      <div className="p-4">
-        <button onClick={handleLogout} className=" cursor-pointer  w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 transition-all duration-200">
+      <div className={collapsed ? 'p-3' : 'p-4'}>
+        <button
+          onClick={handleLogout}
+          title={collapsed ? 'Logout' : undefined}
+          className={`cursor-pointer w-full flex items-center ${collapsed ? 'justify-center px-0' : 'gap-3 px-4'} py-3 rounded-lg hover:bg-white/10 transition-all duration-200`}
+        >
           <img src={logoutIcon} alt="Logout" className="w-6 h-6" />
-          <span style={{ fontFamily: 'Inter', fontWeight: 500, fontSize: '14px', lineHeight: '21px', letterSpacing: '0px' }}>Logout</span>
+          {!collapsed && (
+            <span style={{ fontFamily: 'Inter', fontWeight: 500, fontSize: '14px', lineHeight: '21px', letterSpacing: '0px' }}>
+              Logout
+            </span>
+          )}
         </button>
       </div>
     </div>

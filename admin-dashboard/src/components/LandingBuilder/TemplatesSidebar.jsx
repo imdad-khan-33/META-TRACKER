@@ -1,10 +1,8 @@
 import React from 'react';
-import { Typography, Upload, Button, App, Select, Space } from 'antd';
+import { Typography, Upload, Button, Select } from 'antd';
 import {
     LayoutOutlined,
-    UploadOutlined,
     CloudUploadOutlined,
-    FileImageOutlined
 } from '@ant-design/icons';
 const { Title, Text } = Typography;
 const TemplatesSidebar = ({ onSelectTemplate, onUpload, myPages = [], onSelectPage }) => {
@@ -89,6 +87,13 @@ const TemplatesSidebar = ({ onSelectTemplate, onUpload, myPages = [], onSelectPa
                         Choose File
                     </Button>
                 </Upload>
+                <Text style={{ color: 'rgba(255,255,255,0.85)', display: 'block', marginTop: '10px', fontSize: '12px', lineHeight: 1.4 }}>
+                    Tip: Make sure your Telegram join / CTA button uses{' '}
+                    <span style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace' }}>
+                        id=&quot;telegram_join_btn&quot;
+                    </span>{' '}
+                    so tracking can detect clicks.
+                </Text>
             </div>
         </div>
     );

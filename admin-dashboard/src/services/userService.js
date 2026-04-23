@@ -102,6 +102,46 @@ const userService = {
     }
   },
 
+  getPlatformClientDetails: async (userId) => {
+    try {
+      const response = await api.get(`/api/auth/platform/clients/${userId}`, {
+        params: {
+          limit: 100,
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch client details:', error.response?.data || error.message);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to fetch client details',
+        data: null,
+        error,
+      };
+    }
+  },
+
+  impersonateUser: async (userId) => {
+    try {
+      const response = await api.post(`/api/auth/platform/impersonate/${userId}`);
+      return {
+        success: true,
+        data: response.data,
+        token: response.data?.token,
+        user: response.data?.user,
+        message: response.data?.message || 'Impersonation started',
+      };
+    } catch (error) {
+      console.error('Failed to impersonate user:', error.response?.data || error.message);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to impersonate user',
+        error,
+      };
+    }
+  },
+
   // Toggle platform user active status (enable/disable)
   togglePlatformUserStatus: async (userId) => {
     try {

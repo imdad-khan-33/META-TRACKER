@@ -11,6 +11,13 @@ const Dashboard = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
+  const handleStartDateChange = (date) => {
+    setStartDate(date);
+    if (date && endDate && date > endDate) {
+      setEndDate(null);
+    }
+  };
+
   return (
     <div className="max-w-[1400px] mx-auto">
       <h1 className="text-xl md:text-2xl lg:text-[28px] font-bold text-[#000000] mb-4">Dashboard</h1>
@@ -20,11 +27,12 @@ const Dashboard = () => {
         <div className="relative">
           <DatePicker
             selected={startDate}
-            onChange={(date) => setStartDate(date)}
+            onChange={handleStartDateChange}
             placeholderText="Start Date"
             dateFormat="dd/MM/yyyy"
             customInput={
               <button 
+                type="button"
                 className="flex items-center justify-center gap-[10px] bg-white rounded-[10px] text-sm font-medium text-[#000000] hover:bg-gray-50 transition-colors duration-200 w-full sm:w-[234px] h-[40px] border border-[#CDE5FB]"
               >
                 <img src={calendarIcon} alt="Calendar" className="w-[15px] h-[17px]" />
@@ -44,6 +52,7 @@ const Dashboard = () => {
             minDate={startDate}
             customInput={
               <button 
+                type="button"
                 className="flex items-center justify-center gap-[10px] bg-white rounded-[10px] text-sm font-medium text-[#000000] hover:bg-gray-50 transition-colors duration-200 w-full sm:w-[234px] h-[40px] border border-[#CDE5FB]"
               >
                 <img src={calendarIcon} alt="Calendar" className="w-[15px] h-[17px]" />
@@ -55,7 +64,7 @@ const Dashboard = () => {
         </div>
       </div>
       
-      <StatCards />
+      <StatCards startDate={startDate} endDate={endDate} />
       <DashboardCharts />
       <UserTable />
     </div>

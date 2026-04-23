@@ -196,6 +196,11 @@ const LandingPageEditor = () => {
     const handleUploadAndSave = async (htmlContent, fileName = 'Uploaded Page') => {
         setLoading(true);
         try {
+            const hasTelegramJoinId = /id\s*=\s*["']telegram_join_btn["']/i.test(String(htmlContent || ''));
+            if (!hasTelegramJoinId) {
+                message.warning('Important: your Telegram Join/CTA button should have id="telegram_join_btn" so tracking can detect clicks.');
+            }
+
             const { blocks: tempBlocks, stampedHtml } = parseHtmlToBlocks(htmlContent);
             const payload = {
                 name: fileName,
@@ -383,7 +388,7 @@ const LandingPageEditor = () => {
             }
             if (block.type === 'subscribe') {
                 return `<div style="text-align: center; background: #1a1a2e; padding: 0 40px 40px 40px;">
-                    <a href="${block.content.href || '#'}" class="join-button" style="display: inline-block; background: #3b82f6; color: #fff; padding: 12px 32px; border-radius: 50px; text-decoration: none; font-weight: 700; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); transition: transform 0.2s;">
+                    <a id="telegram_join_btn" href="${block.content.href || '#'}" class="join-button telegram_join_btn" style="display: inline-block; background: #3b82f6; color: #fff; padding: 12px 32px; border-radius: 50px; text-decoration: none; font-weight: 700; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); transition: transform 0.2s;">
                         ${block.content.buttonText || 'Join Now'}
                     </a>
                 </div>`;

@@ -31,6 +31,7 @@ import Subscription from "./pages/Subscription";
 import LandingPageEditor from "./pages/LandingPageEditor";
 function AppRoutes() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef(null);
 
@@ -62,6 +63,22 @@ function AppRoutes() {
     navigate("/");
   };
 
+  const handleReturnToSuperAdmin = () => {
+    const superAdminToken = localStorage.getItem("superAdminAuthToken");
+    const superAdminUser = localStorage.getItem("superAdminUser");
+
+    if (superAdminToken) {
+      localStorage.setItem("authToken", superAdminToken);
+    }
+    if (superAdminUser) {
+      localStorage.setItem("user", superAdminUser);
+    }
+
+    localStorage.removeItem("superAdminAuthToken");
+    localStorage.removeItem("superAdminUser");
+    navigate("/user");
+  };
+
   return (
     <Routes>
       {/* Public Routes - No Header/Sidebar */}
@@ -87,6 +104,15 @@ function AppRoutes() {
                     {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
                   </button>
 
+                  {/* Desktop Sidebar Toggle */}
+                  <button
+                    onClick={() => setSidebarCollapsed((value) => !value)}
+                    className="hidden lg:inline-flex p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                  >
+                    {sidebarCollapsed ? <Menu size={22} /> : <X size={22} />}
+                  </button>
+
                   <img
                     src={logo}
                     alt="Track Bridge Logo"
@@ -95,6 +121,15 @@ function AppRoutes() {
                 </div>
 
                 <div className="flex items-center gap-2 md:gap-4">
+                  {currentUser?.impersonated && (
+                    <button
+                      onClick={handleReturnToSuperAdmin}
+                      className="hidden sm:inline-flex items-center rounded-lg border border-[#CDE5FB] px-3 py-2 text-xs font-semibold text-[#2E73E3] hover:bg-blue-50"
+                    >
+                      Return to Super Admin
+                    </button>
+                  )}
+
                   {/* Profile Dropdown */}
                   <div className="relative" ref={profileRef}>
                     <button
@@ -146,6 +181,14 @@ function AppRoutes() {
                         </div>
 
                         <div className="border-t border-gray-50 mt-1 pt-1">
+                          {currentUser?.impersonated && (
+                            <button
+                              onClick={handleReturnToSuperAdmin}
+                              className="w-full flex sm:hidden items-center gap-3 px-4 py-2.5 text-sm text-[#2E73E3] hover:bg-blue-50 transition-colors text-left"
+                            >
+                              <span className="font-medium">Return to Super Admin</span>
+                            </button>
+                          )}
                           <button
                             onClick={handleLogout}
                             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
@@ -171,7 +214,7 @@ function AppRoutes() {
                 top-[73px] md:top-[81px] h-[calc(100vh-73px)] md:h-[calc(100vh-81px)]
               `}
                 >
-                  <Sidebar closeSidebar={() => setSidebarOpen(false)} />
+                  <Sidebar closeSidebar={() => setSidebarOpen(false)} collapsed={sidebarCollapsed} />
                 </div>
 
                 {/* Overlay for mobile */}
@@ -183,7 +226,7 @@ function AppRoutes() {
                 )}
 
                 {/* Main Content with Routes - Add left margin for sidebar on desktop */}
-                <main className="flex-1 p-4 md:p-6 lg:p-8 w-full lg:ml-64">
+                <main className={`flex-1 p-4 md:p-6 lg:p-8 w-full transition-all duration-300 ${sidebarCollapsed ? "lg:ml-20" : "lg:ml-64"}`}>
                   <Routes>
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/user" element={<User />} />
