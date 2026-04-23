@@ -97,12 +97,18 @@ const Sidebar = ({ closeSidebar, collapsed = false }) => {
                 to={item.path}
                 onClick={closeSidebar}
                 title={collapsed ? item.name : undefined}
-                className={`w-full flex items-center ${collapsed ? 'justify-center px-0' : 'gap-3 px-4'} py-3 rounded-lg transition-all duration-200 ${
+                className={`w-full relative flex items-center text-white ${collapsed ? 'justify-center px-0' : 'gap-3 px-4'} py-3 rounded-lg transition-all duration-200 hover:bg-white/15 hover:shadow-md hover:-translate-y-[1px] ${
                   isActive 
-                    ? 'bg-white/20 shadow-lg' 
+                    ? 'bg-white/25 shadow-lg ring-1 ring-white/20' 
                     : 'hover:bg-white/10'
                 }`}
               >
+                {isActive && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 h-7 w-1 rounded-r bg-white"
+                  />
+                )}
                 {item.name === 'Roles' ? (
                   <RolesIcon />
                 ) : item.iconComponent ? (
@@ -115,7 +121,7 @@ const Sidebar = ({ closeSidebar, collapsed = false }) => {
                   </div>
                 )}
                 {!collapsed && (
-                  <span style={{ fontFamily: 'Inter', fontWeight: 500, fontSize: '14px', lineHeight: '21px', letterSpacing: '0px' }}>
+                  <span style={{ fontFamily: 'Inter', fontWeight: 600, fontSize: '14px', lineHeight: '21px', letterSpacing: '0px', color: '#fff' }}>
                     {item.name}
                   </span>
                 )}
@@ -130,11 +136,11 @@ const Sidebar = ({ closeSidebar, collapsed = false }) => {
         <button
           onClick={handleLogout}
           title={collapsed ? 'Logout' : undefined}
-          className={`cursor-pointer w-full flex items-center ${collapsed ? 'justify-center px-0' : 'gap-3 px-4'} py-3 rounded-lg hover:bg-white/10 transition-all duration-200`}
+          className={`cursor-pointer w-full flex items-center text-white ${collapsed ? 'justify-center px-0' : 'gap-3 px-4'} py-3 rounded-lg hover:bg-white/10 transition-all duration-200`}
         >
           <img src={logoutIcon} alt="Logout" className="w-6 h-6" />
           {!collapsed && (
-            <span style={{ fontFamily: 'Inter', fontWeight: 500, fontSize: '14px', lineHeight: '21px', letterSpacing: '0px' }}>
+            <span style={{ fontFamily: 'Inter', fontWeight: 500, fontSize: '14px', lineHeight: '21px', letterSpacing: '0px', color: '#fff' }}>
               Logout
             </span>
           )}
